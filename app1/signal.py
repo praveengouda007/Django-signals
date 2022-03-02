@@ -10,6 +10,8 @@ post_delete,
 m2m_changed,
 )
 from asgiref.sync import sync_to_async
+import asyncio
+
 
 @receiver(pre_save, sender=BlogPost)
 def blog_post_pre_save(sender, instance, *args, **kwargs):
@@ -20,14 +22,18 @@ def blog_post_pre_save(sender, instance, *args, **kwargs):
 
 
 @receiver(post_save, sender=BlogPost)
-def blog_post_post_save(sender, instance, created, *args, **kwargs):
 
-    if instance.notify_users:
+async def blog_post_post_save(sender, instance, created, *args, **kwargs):
+
+    if created:
         print("notify users")
-        instance.notify_users = False
-        instance.notify_users_timestamp = timezone.now()
+        instance.notify_users = True
         instance.save()
-blog_post_save = sync_to_async(blog_post_post_save, thread_sensitive=True)
+
+#Asynchronous
+# blog_post_save = sync_to_async(blog_post_post_save, thread_sensitive=True)
+# print(blog_post_save)
+
 
 @receiver(pre_delete, sender=BlogPost)
 def blog_post_pre_delete(sender, instance, *args, **kwargs):
@@ -56,4 +62,3 @@ def blog_post_liked_changed(sender, instance, action, *args, **kwargs):
         # qs = model.objects.filter(pk__in='pk_set')
         print(qs.count())
 
-blog_post_liked = sync_to_async(blog_post_liked_changed, thread_sensitive=True)
