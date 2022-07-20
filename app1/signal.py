@@ -53,8 +53,6 @@ def blog_post_post_delete(sender, instance, *args, **kwargs):
 
 @receiver(m2m_changed, sender=BlogPost.liked.through)
 def blog_post_liked_changed(sender, instance, action, *args, **kwargs):
-    # print(args, kwargs)
-    # print(action)
     if action == 'pre_add':
         print('Was added')
         qs = kwargs.get("model").objects.filter(pk__in=kwargs.get('pk_set'))
